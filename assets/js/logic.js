@@ -36,16 +36,33 @@ var config = {
       frequency: frequency
     });
 
+    $("#name-input").val("");
+    $("#destination-input").val("");
+    $("#time-input").val("");
+    $("#rate-input").val("")
+
   });
 
+  function trainMaths(firstTime,freq){
+    var firstTimeConverted = moment(firstTime, "HH:mm");
+    var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+    var tRemainder = diffTime % freq;
+    minutesAway = freq - tRemainder;
+    var nextTrain = moment().add(minutesAway, "minutes");
+    nextArrival = moment(nextTrain).format("hh:mm");
+    };
+
   database.ref().on("child_added", function(snapshot) {
+    trainMaths(snapshot.val().first_train_time,snapshot.val().frequency);
     var row = $("<tr>");
     row.append("<td>"+snapshot.val().name+"</td>");
     row.append("<td>"+snapshot.val().destination+"</td>");
-    row.append("<td>"+snapshot.val().first_train_time+"</td>");
     row.append("<td>"+snapshot.val().frequency+"</td>");
+    row.append("<td>"+nextArrival+"</td>");
+    row.append("<td>"+minutesAway+"</td>");
     $("#tableBody").append(row);
 
   }, function(errorObject) {
     console.log("Errors handled: " + errorObject.code);
   });
+
